@@ -241,6 +241,7 @@ Lozzi.Fields = function () {
         disable: disable,
         disableWithAllowance: disableWithAllowance,
         hide: hide,
+		show: show,
         hideWithAllowance: hideWithAllowance,
         setDefaultValue: setDefaultValue
     }
