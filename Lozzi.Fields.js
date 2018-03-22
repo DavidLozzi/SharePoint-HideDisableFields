@@ -72,9 +72,9 @@ Lozzi.Fields = function () {
     }
 
     var disableLookupField = function (theCell) {
-        theControls = theCell.find("select");
+        var theControls = theCell.find("select");
         var selectedValue = theControls.find("option:selected");
-        value = "<span class='readonly'>" + selectedValue.text() + "<span>";
+        var value = "<span class='readonly'>" + selectedValue.text() + "<span>";
         theControls.hide();
         theCell.prepend(value);
     }
