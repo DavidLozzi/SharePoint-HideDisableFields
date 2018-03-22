@@ -1,7 +1,7 @@
 ﻿"use strict"
 
 /*
-Created by David Lozzi, @davidlozzi, www.davidlozzi.com, 1/10/2014, last modified 8/1/2016
+Created by David Lozzi, @davidlozzi, www.davidlozzi.com, 1/10/2014
 Requires jQuery, you can include: <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 */
 
