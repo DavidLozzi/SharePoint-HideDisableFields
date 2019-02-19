@@ -4,7 +4,10 @@ Lightweight JavaScript file to easily hide or disable fields on a SharePoint cla
 ## Usage ##
 See https://davidlozzi.com/2014/01/14/sharepoint-2013-script-hide-or-disable-your-fields/ for usage and support.
 
-Download the only list JavaScript file above :D
+Download the only listed JavaScript file above :D
+
+
+
 
 #### Lozzi.Fields.disable(fieldname)
 
