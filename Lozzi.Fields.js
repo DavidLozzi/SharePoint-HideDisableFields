@@ -14,6 +14,7 @@ Lozzi.Fields = function () {
 
     var disable = function (fieldDisplayName) {
         var theCell = getCell(fieldDisplayName);
+        var spComments = getComments(theCell); //this stores some of the details about the field
         var value = "";
         var theControls;
         if (theCell.find("[class^='sp-peoplepicker']").length > 0) {
@@ -24,12 +25,24 @@ Lozzi.Fields = function () {
             disableLookupField(theCell);
         } else if (theCell.find("input[type='radio']").length > 0) {
             disableRadioField(theCell);
+        } else if (spComments.indexOf("SPFieldMultiChoice") > -1) {
+            disableMultiSelectField(theCell);
         } else {
             theControls = theCell.find("input,select,textarea,img");
             value = "<span class='readonly'>" + theControls.val() + "<span>";
             theControls.hide();
             theCell.prepend(value);
             theCell.find("div.ms-inputBox").hide();
+        }
+    }
+    var getComments = function (theCell) {
+        var comments = theCell.contents().filter(function(){
+            return this.nodeType == 8 && this.data.indexOf("FieldName") > -1;
+        });
+        if (comments.length > 0) {
+            return comments[0].data
+        } else {
+            return null; //shouldn't happen given all SP fields have comments
         }
     }
     var peopleLoopCount = 0;
@@ -79,13 +92,24 @@ Lozzi.Fields = function () {
         theCell.prepend(value);
     }
 
+    var disableMultiSelectField = function (theCell) {
+        var theControls = theCell.find("table");
+        var selectedValues = theControls.find("input:checked");
+        var value = "";
+        selectedValues.each(function(index) {
+            var selectedLabel = $(this).siblings("label");
+            value += "<span class='readonly'>" + selectedLabel.text() + "<span><br/>";
+        })
+        theControls.hide();
+        theCell.prepend(value);
+    }
+
     var disableRadioField = function (theCell) {
         //debugger
         var theControls = theCell.find("table");
         var selectedValue = theCell.find("input:checked").val();
         theControls.hide();
         theCell.prepend(selectedValue);
-
     }
 
     var enable = function (fieldDisplayName) {
