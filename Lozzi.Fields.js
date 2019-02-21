@@ -14,7 +14,7 @@ Lozzi.Fields = function () {
 
     var disable = function (fieldDisplayName) {
         var theCell = getCell(fieldDisplayName);
-        var spComments = getComments(theCell); //this stores some of the details about the field
+        // var spComments = getComments(theCell); //this stores some of the details about the field
         var value = "";
         var theControls;
         if (theCell.find("[class^='sp-peoplepicker']").length > 0) {
@@ -25,7 +25,7 @@ Lozzi.Fields = function () {
             disableLookupField(theCell);
         } else if (theCell.find("input[type='radio']").length > 0) {
             disableRadioField(theCell);
-        } else if (spComments.indexOf("SPFieldMultiChoice") > -1) {
+        } else if (theCell.find("table[id*='MultiChoiceTable']").length > 0) {
             disableMultiSelectField(theCell);
         } else {
             theControls = theCell.find("input,select,textarea,img");
@@ -35,16 +35,17 @@ Lozzi.Fields = function () {
             theCell.find("div.ms-inputBox").hide();
         }
     }
-    var getComments = function (theCell) {
-        var comments = theCell.contents().filter(function(){
-            return this.nodeType == 8 && this.data.indexOf("FieldName") > -1;
-        });
-        if (comments.length > 0) {
-            return comments[0].data
-        } else {
-            return null; //shouldn't happen given all SP fields have comments
-        }
-    }
+    // An attempt of using the comments to find cell type based on comments, but only works for english
+    // var getComments = function (theCell) {
+    //     var comments = theCell.contents().filter(function(){
+    //         return this.nodeType == 8 && this.data.indexOf("FieldName") > -1;
+    //     });
+    //     if (comments.length > 0) {
+    //         return comments[0].data
+    //     } else {
+    //         return null;
+    //     }
+    // }
     var peopleLoopCount = 0;
     var peoplePickerBorder = "";
     var disablePeoplePicker = function (theCell) {
