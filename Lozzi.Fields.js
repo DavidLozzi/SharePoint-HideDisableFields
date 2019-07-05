@@ -14,17 +14,32 @@ const fields = {
     metadataLoop: 0,
 
     getFieldType: (theCell) => {
-        theCell.contents().map(() => {
-            if (this.nodeType === 8) {
-                console.log(this);
+        let fieldType = '';
+        theCell.contents().each((i, obj) => {
+            if (obj.nodeType === 8) {
                 const ftRegx = new RegExp('(FieldType=")([a-zA-Z]*)"','gmi');
-                const vals = ftRegx.exec(this.data);
+                const vals = ftRegx.exec(obj.data);
                 if(vals && vals.length > 2 ) {
-                    console.log(vals[2]);
-                    return vals[2];
+                    fieldType = vals[2];
                 }
             }
         });
+        return fieldType;
+    },
+
+    getRow: (fieldDisplayName) => {
+        const theCell = fields.getCell(fieldDisplayName);
+        const theRow = theCell.parent();
+        return theRow;
+    },
+
+    getCell: (fieldDisplayName) => {
+        const theCell = $(".ms-formbody").filter((i, o) => {
+            const rx = 'FieldName=\"' + fieldDisplayName + '\"';
+            const html = o.innerHTML.match(new RegExp(rx));
+            return html !== null; // && html.length > 0;
+        });
+        return theCell;
     },
     
     disable: (fieldDisplayName) => {
@@ -35,28 +50,40 @@ const fields = {
         let theControls;
 
         switch (fieldType) {
-            case "":
+            case 'SPFieldLookup':
+                fields.disableLookupField(theCell);
+                break;
+            case 'SPFieldMultiChoice':
+                fields.disableMultiSelectField(theCell);
+                break;
+            case 'SPFieldTaxonomyFieldType':
+                fields.disableMetadata(theCell);
+                break;
+            case 'SPFieldUser':
+                fields.disablePeoplePicker(theCell);
+                break;
+            case 'SPFieldBoolean':
+                fields.disableYesNo(theCell);
+                break;
+            case 'SPFieldChoice':
+                if (theCell.find("input[type='radio']").length > 0) {
+                    fields.disableRadioField(theCell);
+                } else {
+                    fields.defaultType(theCell);
+                }
                 break;
             default:
+                fields.defaultType(theCell);
+                break;
         }
+    },
 
-        if (theCell.find("[class^='sp-peoplepicker']").length > 0) {
-            fields.disablePeoplePicker(theCell);
-        } else if (theCell.find(".ms-taxonomy-fieldeditor").length > 0) {
-            fields.disableMetadata(theCell);
-        } else if (theCell.find("[id*='$LookupField']").length > 0) {
-            fields.disableLookupField(theCell);
-        } else if (theCell.find("input[type='radio']").length > 0) {
-            fields.disableRadioField(theCell);
-        } else if (theCell.find("span[class='ms-RadioText']>input[type='checkbox']").length > 0) {
-            fields.disableMultiSelectField(theCell);
-        } else {
-            theControls = theCell.find("input,select,textarea,img");
-            value = "<span class='readonly'>" + theControls.val() + "<span>";
-            theControls.hide();
-            theCell.prepend(value);
-            theCell.find("div.ms-inputBox").hide();
-        }
+    defaultType: (theCell) => {
+        const theControls = theCell.find("input,select,textarea,img");
+        const value = "<span class='readonly'>" + theControls.val() + "<span>";
+        theControls.hide();
+        theCell.prepend(value);
+        theCell.find("div.ms-inputBox").hide();
     },
 
     disablePeoplePicker: (theCell) => {
@@ -108,20 +135,28 @@ const fields = {
         const theControls = theCell.find("table");
         const selectedValues = theControls.find("input:checked");
         let value = "";
-        selectedValues.each(() => {
-            const selectedLabel = $(this).siblings("label");
+        selectedValues.each((i, o) => {
+            const selectedLabel = $(o).siblings("label");
             value += "<span class='readonly'>" + selectedLabel.text() + "<span><br/>";
         })
         theControls.hide();
         theCell.prepend(value);
     },
+    
+    disableYesNo: (theCell) => {
+        const theControls = theCell.find("input");
+        const isChecked = theControls.is(":checked");
+        const value = "<span class='readonly'>" + (isChecked ? "Yes" : "No") + "</span>";
+        theControls.hide();
+        theCell.prepend(value);
+    },
 
     disableRadioField: (theCell) => {
-        //debugger
         const theControls = theCell.find("table");
         const selectedValue = theCell.find("input:checked").val();
+        const value = "<span class='readonly'>" + selectedValue + "</span><br/>";
         theControls.hide();
-        theCell.prepend(selectedValue);
+        theCell.prepend(value);
     },
 
     enable: (fieldDisplayName) => {
@@ -175,26 +210,6 @@ const fields = {
     show: (fieldDisplayName) => {
         const theRow = fields.getRow(fieldDisplayName);
         theRow.show();
-    },
-
-    getRow: (fieldDisplayName) => {
-        let theRow = $("[Title='" + fieldDisplayName + "'], [Title='" + fieldDisplayName + " possible values']").closest("td.ms-formbody").parent();
-        if (theRow.length == 0) {
-            theRow = $(".ms-formlabel").filter(() => {
-                return $(this).text().trim() == fieldDisplayName || $(this).text().trim() == fieldDisplayName + " *";
-            }).parent();
-        }
-        return theRow;
-    },
-
-    getCell: (fieldDisplayName) => {
-        let theCell = $("[Title='" + fieldDisplayName + "'], [Title='" + fieldDisplayName + " possible values']").closest("td.ms-formbody");
-        if (theCell.length == 0) {
-            theCell = $(".ms-formlabel").filter(() => {
-                return $(this).text().trim() == fieldDisplayName || $(this).text().trim() == fieldDisplayName + " *";
-            }).parent().find("td.ms-formbody");
-        }
-        return theCell;
     },
 
     //group names in an array of strings, i.e. ["Group One","Group Two"]
