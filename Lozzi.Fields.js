@@ -66,7 +66,9 @@ const fields = {
                 fields.disableYesNo(theCell);
                 break;
             case 'SPFieldChoice':
-                if (theCell.find("input[type='radio']").length > 0) {
+                if (theCell.find("input:checked").val() === "FillInButton" || theCell.find("input:checked").val() === "Specify your own value:") {
+                    fields.disableOtherOption(theCell);
+                } else if (theCell.find("input[type='radio']").length > 0) {
                     fields.disableRadioField(theCell);
                 } else {
                     fields.defaultType(theCell);
@@ -80,10 +82,19 @@ const fields = {
 
     defaultType: (theCell) => {
         const theControls = theCell.find("input,select,textarea,img");
-        const value = "<span class='readonly'>" + theControls.val() + "<span>";
+        const value = "<span class='readonly'>" + theControls.val() + "</span>";
+        
         theControls.hide();
         theCell.prepend(value);
         theCell.find("div.ms-inputBox").hide();
+    },
+
+    disableOtherOption: (theCell) => {
+        const theControls = theCell.find("input,select,textarea,img,label,table");
+        const fillInValue = theCell.find("input[id$='FillInChoice'], input[id$='FillInText']").val();
+        const value = "<span class='readonly'>" + fillInValue + "<span>";
+        theControls.hide();
+        theCell.prepend(value);
     },
 
     disablePeoplePicker: (theCell) => {
@@ -137,7 +148,12 @@ const fields = {
         let value = "";
         selectedValues.each((i, o) => {
             const selectedLabel = $(o).siblings("label");
-            value += "<span class='readonly'>" + selectedLabel.text() + "<span><br/>";
+            if (selectedLabel.text() === "Specify your own value:")
+            {
+                value += "<span class='readonly'>" + theCell.find("input[id$=FillInText]").val() + "</span><br/>";
+            } else {
+                value += "<span class='readonly'>" + selectedLabel.text() + "<span><br/>";
+            }
         })
         theControls.hide();
         theCell.prepend(value);
@@ -153,7 +169,10 @@ const fields = {
 
     disableRadioField: (theCell) => {
         const theControls = theCell.find("table");
-        const selectedValue = theCell.find("input:checked").val();
+        let selectedValue = theCell.find("input:checked").val();
+        if(selectedValue === "DropDownButton") {
+            selectedValue = theCell.find("option:selected").val();
+        }
         const value = "<span class='readonly'>" + selectedValue + "</span><br/>";
         theControls.hide();
         theCell.prepend(value);
