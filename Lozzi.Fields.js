@@ -41,13 +41,15 @@ const fields = {
         });
         return theCell;
     },
+
+    writeValue: (theCell, value) => {
+        const spanny = "<span class='readonly'>" + value + "</span>";
+        theCell.prepend(spanny);
+    },
     
     disable: (fieldDisplayName) => {
         const theCell = fields.getCell(fieldDisplayName);
         const fieldType = fields.getFieldType(theCell);
-        
-        let value = "";
-        let theControls;
 
         switch (fieldType) {
             case 'SPFieldLookup':
@@ -82,19 +84,17 @@ const fields = {
 
     defaultType: (theCell) => {
         const theControls = theCell.find("input,select,textarea,img");
-        const value = "<span class='readonly'>" + theControls.val() + "</span>";
+        fields.writeValue(theCell, theControls.val());
         
         theControls.hide();
-        theCell.prepend(value);
         theCell.find("div.ms-inputBox").hide();
     },
 
     disableOtherOption: (theCell) => {
         const theControls = theCell.find("input,select,textarea,img,label,table");
         const fillInValue = theCell.find("input[id$='FillInChoice'], input[id$='FillInText']").val();
-        const value = "<span class='readonly'>" + fillInValue + "<span>";
+        fields.writeValue(theCell, fillInValue);
         theControls.hide();
-        theCell.prepend(value);
     },
 
     disablePeoplePicker: (theCell) => {
@@ -120,9 +120,9 @@ const fields = {
             //console.log("found " + $(".valid-text",theCell).length + " with text " + $(".valid-text",theCell).text());
             const metaValue = $(".valid-text", theCell).text();
             const theControls = theCell.find("input,select,textarea,img");
-            const value = "<span class='readonly'>" + metaValue + "<span>";
+            fields.writeValue(theCell, metaValue);
             theControls.hide();
-            theCell.prepend(value);
+
             theCell.find("div.ms-inputBox").hide();
             fields.metadataLoop = 0;
         } else {
@@ -137,9 +137,8 @@ const fields = {
     disableLookupField: (theCell) => {
         const theControls = theCell.find("select");
         const selectedValue = theControls.find("option:selected");
-        const value = "<span class='readonly'>" + selectedValue.text() + "<span>";
+        fields.writeValue(theCell, selectedValue.text());
         theControls.hide();
-        theCell.prepend(value);
     },
 
     disableMultiSelectField: (theCell) => {
@@ -150,21 +149,21 @@ const fields = {
             const selectedLabel = $(o).siblings("label");
             if (selectedLabel.text() === "Specify your own value:")
             {
-                value += "<span class='readonly'>" + theCell.find("input[id$=FillInText]").val() + "</span><br/>";
+                value += theCell.find("input[id$=FillInText]").val() + "<br/>";
             } else {
-                value += "<span class='readonly'>" + selectedLabel.text() + "<span><br/>";
+                value += selectedLabel.text() + "<br/>";
             }
         })
+        fields.writeValue(theCell, value);
         theControls.hide();
-        theCell.prepend(value);
     },
     
     disableYesNo: (theCell) => {
         const theControls = theCell.find("input");
         const isChecked = theControls.is(":checked");
-        const value = "<span class='readonly'>" + (isChecked ? "Yes" : "No") + "</span>";
+        const value = isChecked ? "Yes" : "No";
+        fields.writeValue(theCell, value);
         theControls.hide();
-        theCell.prepend(value);
     },
 
     disableRadioField: (theCell) => {
@@ -173,9 +172,9 @@ const fields = {
         if(selectedValue === "DropDownButton") {
             selectedValue = theCell.find("option:selected").val();
         }
-        const value = "<span class='readonly'>" + selectedValue + "</span><br/>";
+        const value = selectedValue + "<br/>";
+        fields.writeValue(theCell, value);
         theControls.hide();
-        theCell.prepend(value);
     },
 
     enable: (fieldDisplayName) => {
