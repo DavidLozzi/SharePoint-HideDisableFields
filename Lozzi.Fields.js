@@ -306,6 +306,21 @@ const fields = {
         const selectObj = theCell.find("SELECT");
         selectObj.val(stringValue);
     },
+
+    formatRow: (fieldDisplayName, css) => {
+        const theRow = fields.getRow(fieldDisplayName);
+        theRow.css(css);
+    },
+
+    formatLabel: (fieldDisplayName, css) => {
+        const theRow = fields.getRow(fieldDisplayName);
+        theRow.find(".ms-formlabel").css(css);
+    },
+
+    formatValueCell: (fieldDisplayName, css) => {
+        const theCell = fields.getCell(fieldDisplayName);
+        theCell.css(css);
+    }
 };
 
 const Lozzi = window.Lozzi || {};
