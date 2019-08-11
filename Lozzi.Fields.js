@@ -241,7 +241,7 @@ const fields = {
         fields.spContext.load(fields.currentUser.get_groups());
         fields.spContext.executeQueryAsync(() => {
             fields.getGroupsAndEnable(fieldName, groups)
-        }, asyncFailed);
+        }, fields.asyncFailed);
     },
 
     getGroupsAndEnable: (fieldName, groups) => {
@@ -274,7 +274,7 @@ const fields = {
         fields.spContext.load(fields.currentUser.get_groups());
         fields.spContext.executeQueryAsync(() => {
             fields.getGroupsAndShow(fieldName, groups);
-        }, asyncFailed);
+        }, fields.asyncFailed);
     },
 
     getGroupsAndShow: (fieldName, groups) => {
