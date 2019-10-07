@@ -179,15 +179,22 @@ var fields = {
 
   enable: function (fieldDisplayName) {
     var theCell = fields.getCell(fieldDisplayName);
-    if (theCell.find("[class^='sp-peoplepicker']").length > 0) {
-      fields.enablePeoplePicker(theCell);
-    } else if (theCell.find(".ms-taxonomy-fieldeditor").length > 0) {
-      fields.enableMetadata(theCell);
-    } else {
-      var theControls = theCell.find("input,select,textarea,img");
-      var value = theCell.find("span.readonly")
-      theControls.show();
-      value.remove();
+    var fieldType = fields.getFieldType(theCell);
+
+    switch (fieldType) {
+      case 'SPFieldTaxonomyFieldType':
+        fields.enableMetadata(theCell);
+        break;
+      case 'SPFieldUser':
+      case 'SPFieldUserMulti':
+        fields.enablePeoplePicker(theCell);
+        break;
+      default:
+        var theControls = theCell.find("input,select,textarea,img");
+        var value = theCell.find("span.readonly")
+        theControls.show();
+        value.remove();
+        break;
     }
   },
 
