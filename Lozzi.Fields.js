@@ -62,6 +62,7 @@ var fields = {
         fields.disableMetadata(theCell);
         break;
       case 'SPFieldUser':
+      case 'SPFieldUserMulti':
         fields.disablePeoplePicker(theCell);
         break;
       case 'SPFieldBoolean':
